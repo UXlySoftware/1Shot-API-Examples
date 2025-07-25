@@ -1,0 +1,30 @@
+name: 1shot-telegram-bot
+
+services:
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    command:
+      - "http"
+      - "http://telegram:8000"
+      - "--url=${TUNNEL_BASE_URL}"
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+      TUNNEL_BASE_URL: ${TUNNEL_BASE_URL}
+    ports:
+      - 4040:4040
+
+  telegram-service:
+    image: telegram
+    pull_policy: never
+    container_name: telegram
+    volumes:
+      - ./src:/bot
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      TUNNEL_BASE_URL: ${TUNNEL_BASE_URL}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      ONESHOT_API_KEY: ${ONESHOT_API_KEY}
+      ONESHOT_API_SECRET: ${ONESHOT_API_SECRET}
+      ONESHOT_BUSINESS_ID: ${ONESHOT_BUSINESS_ID}
+    build: ./src/
