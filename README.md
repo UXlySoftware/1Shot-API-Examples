@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="1shot-logo.svg" alt="1Shot" />
+  <img src="./1shot-logo.svg" alt="1Shot" />
 </div>
 
 # 1Shot API Examples
