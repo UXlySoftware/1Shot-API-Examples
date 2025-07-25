@@ -1,0 +1,1 @@
+ curl -X GET "https://n8n.1shotapi.dev/webhook-test/92c5ca23-99a7-437d-85da-84aef8bd2a25" -H "X-PAYMENT: " -H "Accept: application/json"

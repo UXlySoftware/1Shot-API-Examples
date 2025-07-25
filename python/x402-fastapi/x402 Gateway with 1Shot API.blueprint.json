@@ -1,0 +1,1329 @@
+{
+    "name": "x402 Gateway with 1Shot API",
+    "flow": [
+        {
+            "id": 13,
+            "module": "gateway:CustomWebHook",
+            "version": 1,
+            "parameters": {
+                "hook": 0,
+                "maxResults": 1
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 750
+                },
+                "restore": {
+                    "parameters": {
+                        "hook": {
+                            "data": {
+                                "editable": "true"
+                            },
+                            "label": "My gateway-webhook webhook"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "hook",
+                        "type": "hook:gateway-webhook",
+                        "label": "Webhook",
+                        "required": true
+                    },
+                    {
+                        "name": "maxResults",
+                        "type": "number",
+                        "label": "Maximum number of results"
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "__IMTHEADERS__",
+                        "spec": [
+                            {
+                                "name": "name",
+                                "type": "text",
+                                "label": "Name"
+                            },
+                            {
+                                "name": "value",
+                                "type": "text",
+                                "label": "Value"
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Headers"
+                    },
+                    {
+                        "name": "__IMTMETHOD__",
+                        "type": "text",
+                        "label": "Method"
+                    }
+                ],
+                "advanced": true
+            }
+        },
+        {
+            "id": 25,
+            "module": "builtin:BasicRouter",
+            "version": 1,
+            "parameters": {
+                "else": 1
+            },
+            "mapper": null,
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 750
+                }
+            },
+            "routes": [
+                {
+                    "flow": [
+                        {
+                            "id": 26,
+                            "module": "json:ParseJSON",
+                            "version": 1,
+                            "parameters": {
+                                "type": ""
+                            },
+                            "filter": {
+                                "name": "X-Payment Header Found",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{map(13.`__IMTHEADERS__`; \"name\")}}",
+                                            "b": "x-payment",
+                                            "o": "array:contain:ci"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "json": "{{toString(toBinary(get(map(13.`__IMTHEADERS__`; \"value\"; \"name\"; \"x-payment\"); 1); \"base64\"))}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 600
+                                },
+                                "restore": {
+                                    "parameters": {
+                                        "type": {
+                                            "label": "Choose a data structure"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "type",
+                                        "type": "udt",
+                                        "label": "Data structure"
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "json",
+                                        "type": "text",
+                                        "label": "JSON string",
+                                        "required": true
+                                    }
+                                ]
+                            },
+                            "onerror": [
+                                {
+                                    "id": 36,
+                                    "module": "gateway:WebhookRespond",
+                                    "version": 1,
+                                    "parameters": {},
+                                    "mapper": {
+                                        "status": "402",
+                                        "body": "{\n  \"x402Version\": \"1\",\n  \"error\": \"X-PAYMENT header is malformed\"\n}",
+                                        "headers": []
+                                    },
+                                    "metadata": {
+                                        "designer": {
+                                            "x": 900,
+                                            "y": 1200
+                                        },
+                                        "restore": {
+                                            "expect": {
+                                                "headers": {
+                                                    "mode": "chose"
+                                                }
+                                            }
+                                        },
+                                        "expect": [
+                                            {
+                                                "name": "status",
+                                                "type": "uinteger",
+                                                "label": "Status",
+                                                "validate": {
+                                                    "min": 100
+                                                },
+                                                "required": true
+                                            },
+                                            {
+                                                "name": "body",
+                                                "type": "any",
+                                                "label": "Body"
+                                            },
+                                            {
+                                                "name": "headers",
+                                                "type": "array",
+                                                "label": "Custom headers",
+                                                "validate": {
+                                                    "maxItems": 16
+                                                },
+                                                "spec": [
+                                                    {
+                                                        "name": "key",
+                                                        "label": "Key",
+                                                        "type": "text",
+                                                        "required": true,
+                                                        "validate": {
+                                                            "max": 256
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "value",
+                                                        "label": "Value",
+                                                        "type": "text",
+                                                        "required": true,
+                                                        "validate": {
+                                                            "max": 4096
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "id": 30,
+                            "module": "builtin:BasicRouter",
+                            "version": 1,
+                            "parameters": {
+                                "else": 0
+                            },
+                            "mapper": null,
+                            "metadata": {
+                                "designer": {
+                                    "x": 900,
+                                    "y": 450
+                                }
+                            },
+                            "routes": [
+                                {
+                                    "flow": [
+                                        {
+                                            "id": 32,
+                                            "module": "gateway:WebhookRespond",
+                                            "version": 1,
+                                            "parameters": {},
+                                            "mapper": {
+                                                "status": "402",
+                                                "body": "{\n  \"x402Version\": \"1\",\n  \"error\": \"X-PAYMENT signature missing\"\n}",
+                                                "headers": []
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1200,
+                                                    "y": 0
+                                                },
+                                                "restore": {
+                                                    "expect": {
+                                                        "headers": {
+                                                            "mode": "chose"
+                                                        }
+                                                    }
+                                                },
+                                                "expect": [
+                                                    {
+                                                        "name": "status",
+                                                        "type": "uinteger",
+                                                        "label": "Status",
+                                                        "validate": {
+                                                            "min": 100
+                                                        },
+                                                        "required": true
+                                                    },
+                                                    {
+                                                        "name": "body",
+                                                        "type": "any",
+                                                        "label": "Body"
+                                                    },
+                                                    {
+                                                        "name": "headers",
+                                                        "type": "array",
+                                                        "label": "Custom headers",
+                                                        "validate": {
+                                                            "maxItems": 16
+                                                        },
+                                                        "spec": [
+                                                            {
+                                                                "name": "key",
+                                                                "label": "Key",
+                                                                "type": "text",
+                                                                "required": true,
+                                                                "validate": {
+                                                                    "max": 256
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "value",
+                                                                "label": "Value",
+                                                                "type": "text",
+                                                                "required": true,
+                                                                "validate": {
+                                                                    "max": 4096
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "flow": [
+                                        {
+                                            "id": 37,
+                                            "module": "oneshot:SimulateContractMethod",
+                                            "version": 1,
+                                            "parameters": {
+                                                "__IMTCONN__": 4192018
+                                            },
+                                            "filter": {
+                                                "name": "Check for signature field in header payload.",
+                                                "conditions": [
+                                                    [
+                                                        {
+                                                            "a": "{{26.payload.signature}}",
+                                                            "o": "exist"
+                                                        },
+                                                        {
+                                                            "a": "{{26.payload.authorization.value}}",
+                                                            "b": "50000",
+                                                            "o": "text:equal"
+                                                        }
+                                                    ]
+                                                ]
+                                            },
+                                            "mapper": {
+                                                "params": "{\n  \"from\": \"{{26.payload.authorization.from}}\",\n  \"to\": \"{{26.payload.authorization.to}}\",\n  \"value\": \"{{26.payload.authorization.value}}\",\n  \"validAfter\": \"{{26.payload.authorization.validAfter}}\",\n  \"validBefore\": \"{{26.payload.authorization.validBefore}}\",\n  \"nonce\": \"{{26.payload.authorization.nonce}}\",\n  \"signature\": \"{{26.payload.signature}}\"\n}",
+                                                "contractMethodId": "b63aaaa1-059d-4c38-928a-33ad17d66827"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1200,
+                                                    "y": 600
+                                                },
+                                                "restore": {
+                                                    "expect": {
+                                                        "contractMethodId": {
+                                                            "mode": "chose",
+                                                            "label": "x402 demo transferWithAuthorization"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "oneshot"
+                                                            },
+                                                            "label": "My 1Shot API Credential connection"
+                                                        }
+                                                    }
+                                                },
+                                                "parameters": [
+                                                    {
+                                                        "name": "__IMTCONN__",
+                                                        "type": "account:oneshot",
+                                                        "label": "Connection",
+                                                        "required": true
+                                                    }
+                                                ],
+                                                "expect": [
+                                                    {
+                                                        "name": "contractMethodId",
+                                                        "type": "select",
+                                                        "label": "Contract Method Id",
+                                                        "required": true
+                                                    },
+                                                    {
+                                                        "name": "params",
+                                                        "type": "json",
+                                                        "label": "Params",
+                                                        "required": true
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "id": 39,
+                                            "module": "builtin:BasicRouter",
+                                            "version": 1,
+                                            "parameters": {
+                                                "else": 1
+                                            },
+                                            "mapper": null,
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1500,
+                                                    "y": 600
+                                                }
+                                            },
+                                            "routes": [
+                                                {
+                                                    "flow": [
+                                                        {
+                                                            "id": 41,
+                                                            "module": "oneshot:ExecuteContractMethod",
+                                                            "version": 1,
+                                                            "parameters": {
+                                                                "__IMTCONN__": 4192018
+                                                            },
+                                                            "filter": {
+                                                                "name": "",
+                                                                "conditions": [
+                                                                    [
+                                                                        {
+                                                                            "a": "{{37.response.success}}",
+                                                                            "b": "true",
+                                                                            "o": "text:equal"
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                            },
+                                                            "mapper": {
+                                                                "memo": "x402 Payment from {{26.payload.authorization.from}}",
+                                                                "params": "{\n  \"from\": \"{{26.payload.authorization.from}}\",\n  \"to\": \"{{26.payload.authorization.to}}\",\n  \"value\": \"{{26.payload.authorization.value}}\",\n  \"validAfter\": \"{{26.payload.authorization.validAfter}}\",\n  \"validBefore\": \"{{26.payload.authorization.validBefore}}\",\n  \"nonce\": \"{{26.payload.authorization.nonce}}\",\n  \"signature\": \"{{26.payload.signature}}\"\n}",
+                                                                "contractMethodId": "b63aaaa1-059d-4c38-928a-33ad17d66827"
+                                                            },
+                                                            "metadata": {
+                                                                "designer": {
+                                                                    "x": 1800,
+                                                                    "y": 450
+                                                                },
+                                                                "restore": {
+                                                                    "expect": {
+                                                                        "contractMethodId": {
+                                                                            "mode": "chose",
+                                                                            "label": "x402 demo transferWithAuthorization"
+                                                                        }
+                                                                    },
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "oneshot"
+                                                                            },
+                                                                            "label": "My 1Shot API Credential connection"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "parameters": [
+                                                                    {
+                                                                        "name": "__IMTCONN__",
+                                                                        "type": "account:oneshot",
+                                                                        "label": "Connection",
+                                                                        "required": true
+                                                                    }
+                                                                ],
+                                                                "expect": [
+                                                                    {
+                                                                        "name": "contractMethodId",
+                                                                        "type": "select",
+                                                                        "label": "Contract Method Id",
+                                                                        "required": true
+                                                                    },
+                                                                    {
+                                                                        "name": "params",
+                                                                        "type": "json",
+                                                                        "label": "Params",
+                                                                        "required": true
+                                                                    },
+                                                                    {
+                                                                        "name": "memo",
+                                                                        "type": "text",
+                                                                        "label": "Memo"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            "id": 50,
+                                                            "module": "util:SetVariable2",
+                                                            "version": 1,
+                                                            "parameters": {},
+                                                            "mapper": {
+                                                                "name": "PaymentFinalized",
+                                                                "scope": "execution",
+                                                                "value": "false"
+                                                            },
+                                                            "metadata": {
+                                                                "designer": {
+                                                                    "x": 2100,
+                                                                    "y": 450
+                                                                },
+                                                                "restore": {
+                                                                    "expect": {
+                                                                        "scope": {
+                                                                            "label": "One execution"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "expect": [
+                                                                    {
+                                                                        "name": "name",
+                                                                        "type": "text",
+                                                                        "label": "Variable name",
+                                                                        "required": true
+                                                                    },
+                                                                    {
+                                                                        "name": "scope",
+                                                                        "type": "select",
+                                                                        "label": "Variable lifetime",
+                                                                        "required": true,
+                                                                        "validate": {
+                                                                            "enum": [
+                                                                                "roundtrip",
+                                                                                "execution"
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "name": "value",
+                                                                        "type": "any",
+                                                                        "label": "Variable value"
+                                                                    }
+                                                                ],
+                                                                "interface": [
+                                                                    {
+                                                                        "name": "PaymentFinalized",
+                                                                        "label": "PaymentFinalized",
+                                                                        "type": "any"
+                                                                    }
+                                                                ],
+                                                                "advanced": true
+                                                            }
+                                                        },
+                                                        {
+                                                            "id": 43,
+                                                            "module": "builtin:BasicRepeater",
+                                                            "version": 1,
+                                                            "parameters": {},
+                                                            "mapper": {
+                                                                "step": "1",
+                                                                "start": "1",
+                                                                "repeats": "20"
+                                                            },
+                                                            "metadata": {
+                                                                "designer": {
+                                                                    "x": 2400,
+                                                                    "y": 450
+                                                                },
+                                                                "restore": {},
+                                                                "expect": [
+                                                                    {
+                                                                        "name": "start",
+                                                                        "type": "number",
+                                                                        "label": "Initial value",
+                                                                        "required": true
+                                                                    },
+                                                                    {
+                                                                        "name": "repeats",
+                                                                        "type": "number",
+                                                                        "label": "Repeats",
+                                                                        "required": true,
+                                                                        "validate": {
+                                                                            "max": 10000,
+                                                                            "min": 0
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "name": "step",
+                                                                        "type": "number",
+                                                                        "label": "Step",
+                                                                        "required": true
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            "id": 51,
+                                                            "module": "util:GetVariable2",
+                                                            "version": 1,
+                                                            "parameters": {},
+                                                            "mapper": {
+                                                                "name": "PaymentFinalized"
+                                                            },
+                                                            "metadata": {
+                                                                "designer": {
+                                                                    "x": 2700,
+                                                                    "y": 450
+                                                                },
+                                                                "restore": {},
+                                                                "expect": [
+                                                                    {
+                                                                        "name": "name",
+                                                                        "type": "text",
+                                                                        "label": "Variable name",
+                                                                        "required": true
+                                                                    }
+                                                                ],
+                                                                "interface": [
+                                                                    {
+                                                                        "name": "PaymentFinalized",
+                                                                        "type": "any",
+                                                                        "label": "PaymentFinalized"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            "id": 46,
+                                                            "module": "util:FunctionSleep",
+                                                            "version": 1,
+                                                            "parameters": {},
+                                                            "filter": {
+                                                                "name": "Stop on PaymentFinalized",
+                                                                "conditions": [
+                                                                    [
+                                                                        {
+                                                                            "a": "{{51.PaymentFinalized}}",
+                                                                            "b": "false",
+                                                                            "o": "text:equal"
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                            },
+                                                            "mapper": {
+                                                                "duration": "1"
+                                                            },
+                                                            "metadata": {
+                                                                "designer": {
+                                                                    "x": 3000,
+                                                                    "y": 450
+                                                                },
+                                                                "restore": {},
+                                                                "expect": [
+                                                                    {
+                                                                        "name": "duration",
+                                                                        "type": "uinteger",
+                                                                        "label": "Delay",
+                                                                        "required": true,
+                                                                        "validate": {
+                                                                            "max": 300,
+                                                                            "min": 1
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            "id": 47,
+                                                            "module": "oneshot:GetTransaction",
+                                                            "version": 1,
+                                                            "parameters": {
+                                                                "__IMTCONN__": 4192018
+                                                            },
+                                                            "mapper": {
+                                                                "transactionId": "{{41.id}}"
+                                                            },
+                                                            "metadata": {
+                                                                "designer": {
+                                                                    "x": 3300,
+                                                                    "y": 450
+                                                                },
+                                                                "restore": {
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "oneshot"
+                                                                            },
+                                                                            "label": "My 1Shot API Credential connection"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "parameters": [
+                                                                    {
+                                                                        "name": "__IMTCONN__",
+                                                                        "type": "account:oneshot",
+                                                                        "label": "Connection",
+                                                                        "required": true
+                                                                    }
+                                                                ],
+                                                                "expect": [
+                                                                    {
+                                                                        "name": "transactionId",
+                                                                        "type": "uuid",
+                                                                        "label": "Transaction ID",
+                                                                        "required": true
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            "id": 48,
+                                                            "module": "builtin:BasicRouter",
+                                                            "version": 1,
+                                                            "mapper": null,
+                                                            "metadata": {
+                                                                "designer": {
+                                                                    "x": 3600,
+                                                                    "y": 450
+                                                                }
+                                                            },
+                                                            "routes": [
+                                                                {
+                                                                    "flow": [
+                                                                        {
+                                                                            "id": 52,
+                                                                            "module": "util:SetVariable2",
+                                                                            "version": 1,
+                                                                            "parameters": {},
+                                                                            "filter": {
+                                                                                "name": "Transaction Completed",
+                                                                                "conditions": [
+                                                                                    [
+                                                                                        {
+                                                                                            "a": "{{47.status}}",
+                                                                                            "o": "text:equal",
+                                                                                            "b": "Completed"
+                                                                                        },
+                                                                                        {
+                                                                                            "a": "{{50.PaymentFinalized}}",
+                                                                                            "o": "text:equal",
+                                                                                            "b": "false"
+                                                                                        }
+                                                                                    ]
+                                                                                ]
+                                                                            },
+                                                                            "mapper": {
+                                                                                "name": "PaymentFinalized",
+                                                                                "scope": "execution",
+                                                                                "value": "true"
+                                                                            },
+                                                                            "metadata": {
+                                                                                "designer": {
+                                                                                    "x": 3900,
+                                                                                    "y": 300
+                                                                                },
+                                                                                "restore": {
+                                                                                    "expect": {
+                                                                                        "scope": {
+                                                                                            "label": "One execution"
+                                                                                        }
+                                                                                    }
+                                                                                },
+                                                                                "expect": [
+                                                                                    {
+                                                                                        "name": "name",
+                                                                                        "type": "text",
+                                                                                        "label": "Variable name",
+                                                                                        "required": true
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "scope",
+                                                                                        "type": "select",
+                                                                                        "label": "Variable lifetime",
+                                                                                        "required": true,
+                                                                                        "validate": {
+                                                                                            "enum": [
+                                                                                                "roundtrip",
+                                                                                                "execution"
+                                                                                            ]
+                                                                                        }
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "value",
+                                                                                        "type": "any",
+                                                                                        "label": "Variable value"
+                                                                                    }
+                                                                                ],
+                                                                                "interface": [
+                                                                                    {
+                                                                                        "name": "PaymentFinalized",
+                                                                                        "label": "PaymentFinalized",
+                                                                                        "type": "any"
+                                                                                    }
+                                                                                ],
+                                                                                "advanced": true
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "id": 42,
+                                                                            "module": "gateway:WebhookRespond",
+                                                                            "version": 1,
+                                                                            "parameters": {},
+                                                                            "mapper": {
+                                                                                "body": "Payment Received",
+                                                                                "status": "200",
+                                                                                "headers": []
+                                                                            },
+                                                                            "metadata": {
+                                                                                "designer": {
+                                                                                    "x": 4200,
+                                                                                    "y": 300
+                                                                                },
+                                                                                "restore": {
+                                                                                    "expect": {
+                                                                                        "headers": {
+                                                                                            "mode": "chose"
+                                                                                        }
+                                                                                    }
+                                                                                },
+                                                                                "expect": [
+                                                                                    {
+                                                                                        "name": "status",
+                                                                                        "type": "uinteger",
+                                                                                        "label": "Status",
+                                                                                        "required": true,
+                                                                                        "validate": {
+                                                                                            "min": 100
+                                                                                        }
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "body",
+                                                                                        "type": "any",
+                                                                                        "label": "Body"
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "headers",
+                                                                                        "spec": [
+                                                                                            {
+                                                                                                "name": "key",
+                                                                                                "type": "text",
+                                                                                                "label": "Key",
+                                                                                                "required": true,
+                                                                                                "validate": {
+                                                                                                    "max": 256
+                                                                                                }
+                                                                                            },
+                                                                                            {
+                                                                                                "name": "value",
+                                                                                                "type": "text",
+                                                                                                "label": "Value",
+                                                                                                "required": true,
+                                                                                                "validate": {
+                                                                                                    "max": 4096
+                                                                                                }
+                                                                                            }
+                                                                                        ],
+                                                                                        "type": "array",
+                                                                                        "label": "Custom headers",
+                                                                                        "validate": {
+                                                                                            "maxItems": 16
+                                                                                        }
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "flow": [
+                                                                        {
+                                                                            "id": 53,
+                                                                            "module": "util:SetVariable2",
+                                                                            "version": 1,
+                                                                            "parameters": {},
+                                                                            "filter": {
+                                                                                "name": "Transaction Failed",
+                                                                                "conditions": [
+                                                                                    [
+                                                                                        {
+                                                                                            "a": "{{47.status}}",
+                                                                                            "o": "text:equal",
+                                                                                            "b": "Failed"
+                                                                                        },
+                                                                                        {
+                                                                                            "a": "{{50.PaymentFinalized}}",
+                                                                                            "o": "text:equal",
+                                                                                            "b": "false"
+                                                                                        }
+                                                                                    ]
+                                                                                ]
+                                                                            },
+                                                                            "mapper": {
+                                                                                "name": "PaymentFinalized",
+                                                                                "scope": "execution",
+                                                                                "value": "true"
+                                                                            },
+                                                                            "metadata": {
+                                                                                "designer": {
+                                                                                    "x": 3900,
+                                                                                    "y": 600
+                                                                                },
+                                                                                "restore": {
+                                                                                    "expect": {
+                                                                                        "scope": {
+                                                                                            "label": "One execution"
+                                                                                        }
+                                                                                    }
+                                                                                },
+                                                                                "expect": [
+                                                                                    {
+                                                                                        "name": "name",
+                                                                                        "type": "text",
+                                                                                        "label": "Variable name",
+                                                                                        "required": true
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "scope",
+                                                                                        "type": "select",
+                                                                                        "label": "Variable lifetime",
+                                                                                        "required": true,
+                                                                                        "validate": {
+                                                                                            "enum": [
+                                                                                                "roundtrip",
+                                                                                                "execution"
+                                                                                            ]
+                                                                                        }
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "value",
+                                                                                        "type": "any",
+                                                                                        "label": "Variable value"
+                                                                                    }
+                                                                                ],
+                                                                                "interface": [
+                                                                                    {
+                                                                                        "name": "PaymentFinalized",
+                                                                                        "label": "PaymentFinalized",
+                                                                                        "type": "any"
+                                                                                    }
+                                                                                ],
+                                                                                "advanced": true
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "id": 49,
+                                                                            "module": "gateway:WebhookRespond",
+                                                                            "version": 1,
+                                                                            "parameters": {},
+                                                                            "mapper": {
+                                                                                "status": "402",
+                                                                                "body": "{\n  \"x402Version\": \"1\",\n  \"error\": \"X-PAYMENT payment failed\"\n}",
+                                                                                "headers": []
+                                                                            },
+                                                                            "metadata": {
+                                                                                "designer": {
+                                                                                    "x": 4200,
+                                                                                    "y": 600
+                                                                                },
+                                                                                "restore": {
+                                                                                    "expect": {
+                                                                                        "headers": {
+                                                                                            "mode": "chose"
+                                                                                        }
+                                                                                    }
+                                                                                },
+                                                                                "expect": [
+                                                                                    {
+                                                                                        "name": "status",
+                                                                                        "type": "uinteger",
+                                                                                        "label": "Status",
+                                                                                        "validate": {
+                                                                                            "min": 100
+                                                                                        },
+                                                                                        "required": true
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "body",
+                                                                                        "type": "any",
+                                                                                        "label": "Body"
+                                                                                    },
+                                                                                    {
+                                                                                        "name": "headers",
+                                                                                        "type": "array",
+                                                                                        "label": "Custom headers",
+                                                                                        "validate": {
+                                                                                            "maxItems": 16
+                                                                                        },
+                                                                                        "spec": [
+                                                                                            {
+                                                                                                "name": "key",
+                                                                                                "label": "Key",
+                                                                                                "type": "text",
+                                                                                                "required": true,
+                                                                                                "validate": {
+                                                                                                    "max": 256
+                                                                                                }
+                                                                                            },
+                                                                                            {
+                                                                                                "name": "value",
+                                                                                                "label": "Value",
+                                                                                                "type": "text",
+                                                                                                "required": true,
+                                                                                                "validate": {
+                                                                                                    "max": 4096
+                                                                                                }
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "flow": [
+                                                        {
+                                                            "id": 40,
+                                                            "module": "gateway:WebhookRespond",
+                                                            "version": 1,
+                                                            "parameters": {},
+                                                            "mapper": {
+                                                                "status": "402",
+                                                                "body": "{\n  \"x402Version\": \"1\",\n  \"error\": \"X-PAYMENT payment invalid\"\n}",
+                                                                "headers": []
+                                                            },
+                                                            "metadata": {
+                                                                "designer": {
+                                                                    "x": 1800,
+                                                                    "y": 900
+                                                                },
+                                                                "restore": {
+                                                                    "expect": {
+                                                                        "headers": {
+                                                                            "mode": "chose"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "expect": [
+                                                                    {
+                                                                        "name": "status",
+                                                                        "type": "uinteger",
+                                                                        "label": "Status",
+                                                                        "validate": {
+                                                                            "min": 100
+                                                                        },
+                                                                        "required": true
+                                                                    },
+                                                                    {
+                                                                        "name": "body",
+                                                                        "type": "any",
+                                                                        "label": "Body"
+                                                                    },
+                                                                    {
+                                                                        "name": "headers",
+                                                                        "type": "array",
+                                                                        "label": "Custom headers",
+                                                                        "validate": {
+                                                                            "maxItems": 16
+                                                                        },
+                                                                        "spec": [
+                                                                            {
+                                                                                "name": "key",
+                                                                                "label": "Key",
+                                                                                "type": "text",
+                                                                                "required": true,
+                                                                                "validate": {
+                                                                                    "max": 256
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "name": "value",
+                                                                                "label": "Value",
+                                                                                "type": "text",
+                                                                                "required": true,
+                                                                                "validate": {
+                                                                                    "max": 4096
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 23,
+                            "module": "gateway:WebhookRespond",
+                            "version": 1,
+                            "parameters": {},
+                            "mapper": {
+                                "status": "402",
+                                "body": "{\n  \"x402Version\": \"1\",\n  \"error\": \"X-PAYMENT header missing\"\n}",
+                                "headers": []
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 1500
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "headers": {
+                                            "mode": "chose"
+                                        }
+                                    }
+                                },
+                                "expect": [
+                                    {
+                                        "name": "status",
+                                        "type": "uinteger",
+                                        "label": "Status",
+                                        "validate": {
+                                            "min": 100
+                                        },
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "body",
+                                        "type": "any",
+                                        "label": "Body"
+                                    },
+                                    {
+                                        "name": "headers",
+                                        "type": "array",
+                                        "label": "Custom headers",
+                                        "validate": {
+                                            "maxItems": 16
+                                        },
+                                        "spec": [
+                                            {
+                                                "name": "key",
+                                                "label": "Key",
+                                                "type": "text",
+                                                "required": true,
+                                                "validate": {
+                                                    "max": 256
+                                                }
+                                            },
+                                            {
+                                                "name": "value",
+                                                "label": "Value",
+                                                "type": "text",
+                                                "required": true,
+                                                "validate": {
+                                                    "max": 4096
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "instant": true,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "us2.make.com",
+        "notes": [
+            {
+                "moduleIds": [
+                    36
+                ],
+                "content": "<p>If there is a data format error, return a 402 error code.</p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    49
+                ],
+                "content": "<p>In the scenario where the onchain payment transaction failed, we will return a 402 error code. </p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    48
+                ],
+                "content": "<p>Switch on the final transaction status, Completed or Failed. </p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    47
+                ],
+                "content": "<p>Check the status of our payment transaction.</p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    46
+                ],
+                "content": "<p>A 1 second delay to wait for transaction confirmation.</p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    43
+                ],
+                "content": "<p>We want to ensure the transaction is mined before we give the caller access to premium content so we will poll on the status of our transaction until we know if it has succeeded or failed. </p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    42
+                ],
+                "content": "<p>Replace this node with the Make workflow you wish to monetize with x402. As is, this node will return a 200 code to the caller with a success message. </p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    41
+                ],
+                "content": "<p>If the simulation succeeded, we will submit the transaction to the blockchain. Be sure to configure this node to point at an instance of 'transferWithAuthorization` on the token you want to receive as payment. </p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    40
+                ],
+                "content": "<p>If the transaction simulation failed, we return a 402 error code. </p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    39
+                ],
+                "content": "<p>The simulation step will return 'true' if the transaction data is well formed and valid and 'false' otherwise. </p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    37
+                ],
+                "content": "<p>Now that we have validated the x-payment header, we attempt to simulate the transaction to ensure it will succeed. Be sure to configure the node to point to a 'transferWithAuthorization' method belonging to the token you wish to receive as payment for your workflow. </p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    32
+                ],
+                "content": "<p>If we don't find the signature field we return a 402 error code.</p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    30
+                ],
+                "content": "<p>Once we have decoded the x-payment header value, we check for the presence of the required signature field. Configure the filter to check for the required payment value. </p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    26
+                ],
+                "content": "<p>Here we docode the base64 encoded x-payment header value. The resulting payment object must contain a signature field as well as the other fields necessary to call the transferWithAuthorization function. </p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    23
+                ],
+                "content": "<p>If we didn't find an x-payment header field, then we return a 402 error code. </p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    25
+                ],
+                "content": "<p>The first step is to make sure the caller has provided an x-payment header field.</p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            },
+            {
+                "moduleIds": [
+                    13
+                ],
+                "content": "<p>This is your x402 payment gateway that receives HTTP calls to trigger your premium service. Connect your service downstream of this workflow to serve the premium content to your users.</p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            }
+        ]
+    }
+}
