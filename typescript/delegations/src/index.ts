@@ -48,13 +48,14 @@ if (oneshotWallet.response.length === 0) {
   );
 }
 
+const oneshotRelayerAddress: `0x${string}` = oneshotWallet.response[0]
+  .accountBalanceDetails?.accountAddress as `0x${string}`;
+console.log("1Shot Wallets:", oneshotWallet.response[0].accountBalanceDetails);
+
 // **********************************************************
 // "Client-Side" actions: Creating and signing a delegation and
 // EIP-7702 authorization happen client-side in your dApp
 // **********************************************************
-const oneshotRelayerAddress: `0x${string}` = oneshotWallet.response[0]
-  .accountBalanceDetails?.accountAddress as `0x${string}`;
-console.log("1Shot Wallets:", oneshotWallet.response[0].accountBalanceDetails);
 
 // Setup a viem account from the private key
 const account = privateKeyToAccount(`0x${PRIVATE_KEY}`);
