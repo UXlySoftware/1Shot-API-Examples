@@ -23,11 +23,11 @@ const ONESHOT_KEY = requireEnv("ONESHOT_KEY");
 const ONESHOT_SECRET = requireEnv("ONESHOT_SECRET");
 const ONESHOT_BIZ_ID = requireEnv("ONESHOT_BIZ_ID");
 const PRIVATE_KEY = requireEnv("PRIVATE_KEY");
-const STATELESS_DELGATOR = "0x63c0c19a282a1b52b07dd5a65b58948a07dae32b"; // same on every chain
 
 // Constants (you don't need to change these)
+const STATELESS_DELGATOR = "0x63c0c19a282a1b52b07dd5a65b58948a07dae32b"; // same on every chain
 const USDC_ADDRESS = "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"; // USDC on Optimism
-const ONESHOT_USDC_PROMPT_ID = "56e1f682-9864-4ba1-bafc-332647af7822";
+const ONESHOT_USDC_PROMPT_ID = "56e1f682-9864-4ba1-bafc-332647af7822"; // 1Shot API prompt id for Optimism USDC contract methods
 
 // Initialize the 1Shot API client
 // We only initialize this here so that we can easily check we have a 1Shot API server 
