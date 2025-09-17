@@ -1,3 +1,9 @@
+<div align="center">
+  <a href="https://youtu.be/hQp-UVfDQz0">
+    <img src="https://img.youtube.com/vi/hQp-UVfDQz0/hqdefault.jpg" alt="Watch the tutorial">
+  </a>
+</div>
+
 # Sponsored Delegation with MetaMask Smart Wallet
 
 This example shows you how to set up sponsored delegations using the MetaMask Delegation Toolkit and 1Shot API. 1Shot API lets you store user delegations so they can be retrieved on-demand when needed. Additionally, 1Shot API makes delection execution simple using `executeAsDelegator` which automatically prepares the target function call, finds a compatible delegation, and routes the transaction through the Delegation Manager contract for you. 
