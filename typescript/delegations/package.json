@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@metamask/delegation-toolkit": "0.13.0",
-    "@uxly/1shot-client": "^1.2.14",
+    "@uxly/1shot-client": "^1.2.15",
     "dotenv": "^17.2.2",
     "ethers": "^6.15.0"
   }
