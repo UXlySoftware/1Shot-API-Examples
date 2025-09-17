@@ -6,7 +6,7 @@ import {
   toMetaMaskSmartAccount,
   getDeleGatorEnvironment,
 } from "@metamask/delegation-toolkit";
-import { arbitrum as chain } from "viem/chains";
+import { optimism as chain } from "viem/chains";
 import { serializeSignature, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
@@ -26,8 +26,8 @@ const PRIVATE_KEY = requireEnv("PRIVATE_KEY");
 const STATELESS_DELGATOR = "0x63c0c19a282a1b52b07dd5a65b58948a07dae32b"; // same on every chain
 
 // Constants (you don't need to change these)
-const USDC_ADDRESS = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"; // USDC on Linea
-const ONESHOT_USDC_PROMPT_ID = "7d92d5db-99e3-4b1e-9cfe-74e80eeb842b";
+const USDC_ADDRESS = "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"; // USDC on Optimism
+const ONESHOT_USDC_PROMPT_ID = "56e1f682-9864-4ba1-bafc-332647af7822";
 
 // Initialize the 1Shot API client
 // We only initialize this here so that we can easily check we have a 1Shot API server 
@@ -37,14 +37,14 @@ const oneshotClient = new OneShotClient({
   apiSecret: ONESHOT_SECRET
 });
 
-// Ensure there is a Linea Network server wallet for this business for delegation sponsorship
+// Ensure there is a Optimism Network server wallet for this business for delegation sponsorship
 // IMPORTANT: To run this example, the server wallet must have enough gas funds for the tx
 const oneshotWallet = await oneshotClient.wallets.list(ONESHOT_BIZ_ID, {
-  chainId: chain.id, // Linea Mainnet
+  chainId: chain.id, // Optimism Mainnet
 });
 if (oneshotWallet.response.length === 0) {
   throw new Error(
-    "No 1Shot Wallet found for this business on Linea Mainnet, please create one in the 1Shot dashboard & fund with Linea ETH."
+    "No 1Shot Wallet found for this business on Optimism Mainnet, please create one in the 1Shot dashboard & fund with Optimism ETH."
   );
 }
 
@@ -121,7 +121,7 @@ console.log("signedAuthorization:", signedAuthorization);
 // **********************************************************
 // "Server-Side" actions: These actions would be performed 
 // server-side by your business logic. Simultaneously, we
-// upgrade the user's EOA to a MetaMask Smart Account on Linea
+// upgrade the user's EOA to a MetaMask Smart Account on Optimism
 // and call approve() on the user's USDC funds.
 // **********************************************************
 // store the delegation in 1Shot API
@@ -133,7 +133,7 @@ const storedDelegation = await oneshotClient.wallets.createDelegation(
     }
 );
 
-// Assure we have Linea USDC contract methods imported into our 1Shot API account so that we
+// Assure we have Optimism USDC contract methods imported into our 1Shot API account so that we
 // can call its methods in a delegated transaction
 const USDCMethods = await oneshotClient.contractMethods.assureContractMethodsFromPrompt(
     ONESHOT_BIZ_ID,
