@@ -9,10 +9,9 @@ In this example, you'll upgrade an EOA to a MetaMask Smart Wallet and execute a 
 1. Make a free [1Shot API](https://1shotapi.com) account.
 2. Go to the [API Keys](https://app.1shotapi.com/api-keys) tab and generate a new API key and secret.
 3. Provision an Optimism server wallet on the [wallets tab](https://app.1shotapi.com/wallets) and deposit a small amount of native token to cover transaction gas ($1 will do hundreds of txs).
-4. Clone this repo and `cd ./typescript/delegations`.
-5. `cp .env.example .env`
-6. Input your 1Shot API key and secret as well as your business id (located at the top right corner of the 1Shot API dashboard) into the `.env` file
-7. Put a private key into the `.env` file (it doesn't need any funds, txs will be sponsored by your 1Shot API server wallet)
+4. Clone this repo and `cd ./typescript/delegations` then `cp .env.example .env`.
+5. Input your 1Shot API key and secret as well as your business id (located at the top right corner of the 1Shot API dashboard) into the `.env` file
+6. Put a private key into the `.env` file (it doesn't need any funds, txs will be sponsored by your 1Shot API server wallet)
 
 ## Running the Delegation Example
 

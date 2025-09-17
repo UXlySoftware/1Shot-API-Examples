@@ -65,6 +65,21 @@ const viemWalletClient = createWalletClient({
   transport: http(),
 });
 
+// Prepare and sign an EIP-7702 authorization so that the user's EOA can be 
+// upgraded to a MetaMask Smart Account 
+const authorization = await viemWalletClient.prepareAuthorization({
+  contractAddress: STATELESS_DELGATOR,
+  executor: undefined, // the authorization will be executed/sponsored by the 1Shot API server wallet
+});
+const authorizationSignature = serializeSignature(
+  await viemWalletClient.signAuthorization(authorization)
+);
+const signedAuthorization = {
+    ...authorization,
+    signature: authorizationSignature,
+}
+console.log("signedAuthorization:", signedAuthorization);
+
 // We need cast the viem wallet client as a MetaMask Smart Account so that we can sign the delegation
 const smartAccount = await toMetaMaskSmartAccount({
   client: viemWalletClient as any, // TODO: this requires casting as any but it shouldn't
@@ -74,7 +89,11 @@ const smartAccount = await toMetaMaskSmartAccount({
 });
 console.log("Viem account address:", account.address);
 
-// Additional caveats to limit the scope of the delegation
+// Create a EIP-7715 delegation to allow the 1Shot API server wallet to act on behalf of the user
+// This simple delegation illustrates how to give the 1Shot API server wallet permission to call 
+// approve() on the user's USDC
+
+// Additional optional caveats to limit the scope of the delegation
 const caveats = [
   {
     type: "limitedCalls",
@@ -82,9 +101,6 @@ const caveats = [
   },
 ];
 
-// Create a EIP-7715 delegation to allow the 1Shot API server wallet to act on behalf of the user
-// This simple delegation illustrates how to give the 1Shot API server wallet permission to call 
-// approve() on the user's USDC
 const delegation = createDelegation({
   scope: {
     type: "functionCall",
@@ -102,21 +118,6 @@ const signedDelegation = {
   signature: delegationSignature,
 };
 console.log("signedDelegation:", signedDelegation);
-
-// Prepare and sign an EIP-7702 authorization so that the user's EOA can be 
-// upgraded to a MetaMask Smart Account 
-const authorization = await viemWalletClient.prepareAuthorization({
-  contractAddress: STATELESS_DELGATOR,
-  executor: undefined, // the authorization will be executed/sponsored by the 1Shot API server wallet
-});
-const authorizationSignature = serializeSignature(
-  await viemWalletClient.signAuthorization(authorization)
-);
-const signedAuthorization = {
-    ...authorization,
-    signature: authorizationSignature,
-}
-console.log("signedAuthorization:", signedAuthorization);
 
 // **********************************************************
 // "Server-Side" actions: These actions would be performed 
