@@ -1,21 +1,15 @@
 import { config } from "dotenv";
 import express from "express";
-import { paymentMiddleware, Resource, type SolanaAddress } from "x402-express";
-import { facilitator, createFacilitatorConfig } from "@1shotapi/x402-facilitator";
+import { paymentMiddleware, type SolanaAddress } from "x402-express";
+import { createFacilitatorConfig } from "@1shotapi/x402-facilitator";
 config();
 
 const facilitatorConfig = createFacilitatorConfig(
-  "fJwkHW/LweTf33odtReAesNzdEztLyWG",
-  "k5T0++DMDLrD621o1hfRLaXk53fyYq2I",
+  process.env.ONESHOT_API_KEY!,
+  process.env.ONESHOT_API_SECRET!,
 );
 
-const facilitatorUrl = process.env.FACILITATOR_URL as Resource;
 const payTo = process.env.ADDRESS as `0x${string}` | SolanaAddress;
-
-if (!facilitatorUrl || !payTo) {
-  console.error("Missing required environment variables");
-  process.exit(1);
-}
 
 const app = express();
 
@@ -27,8 +21,7 @@ app.use(
         // USDC amount in dollars
         price: "$0.001",
         // network: "base" // uncomment for Base mainnet
-        // network: "solana" // uncomment for Solana mainnet
-        network: "sepolia",
+        network: "base-sepolia",
       },
       "/premium/*": {
         // Define atomic amounts in any EIP-3009 token
@@ -37,21 +30,14 @@ app.use(
           asset: {
             address: "0x9fead8b19c044c2f404dac38b925ea16adaa2954",
             decimals: 18,
-            // omit eip712 for Solana
             eip712: {
-);
-
-const facilitatorUrl = process.env.FACILITATOR_URL as Resource;
-const payTo = process.env.ADDRESS as `0x${string}` | SolanaAddress;
-
               name: "USDC",
               version: "2",
             },
           },
         },
         // network: "base" // uncomment for Base mainnet
-        // network: "solana" // uncomment for Solana mainnet
-        network: "sepolia",
+        network: "base-sepolia",
       },
     },
     facilitatorConfig,

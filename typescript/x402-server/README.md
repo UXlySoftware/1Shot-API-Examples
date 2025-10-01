@@ -1,9 +1,9 @@
-# x402-express Example Server
+# x402-express Example Server with 1Shot API
 
 This is an example Express.js server that demonstrates how to use the `x402-express` middleware to implement paywall functionality in your API endpoints using 1Shot API as a payments facilitator.
 
 ## Prerequisites
-
+/x402
 - Node.js v20+ (install via [nvm](https://github.com/nvm-sh/nvm))
 - pnpm v10 (install via [pnpm.io/installation](https://pnpm.io/installation))
 - A valid Ethereum address for receiving payments
@@ -15,7 +15,7 @@ This is an example Express.js server that demonstrates how to use the `x402-expr
 
 1. Copy `.env-local` to `.env` and add your Ethereum address to receive payments:
 
-```bash
+```bash/x402
 cp .env-local .env
 ```
 
@@ -50,7 +50,7 @@ pnpm dev
 cd ../clients/axios
 # Ensure .env is setup
 pnpm install
-pnpm dev
+pnpm dev/x402
 ```
 
 These clients will demonstrate how to:
