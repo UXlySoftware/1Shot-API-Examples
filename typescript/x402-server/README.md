@@ -35,25 +35,19 @@ pnpm dev
 
 ## Testing the Server
 
-You can test the server using one of the example clients:
+The easiest way to hit an endpoint is with `curl`:
 
-### Using the Fetch Client
-```bash
-cd ../clients/fetch
-# Ensure .env is setup
-pnpm install
-pnpm dev
+```sh
+curl -X GET \
+  http://localhost:4021/weather \
+  -H "x-payment: YOUR-BASE64-ENCODED-PAYMENT-PAYLOAD" \
+  -H "User-Agent: CustomUserAgent/1.0" \
+  -H "Accept: application/json"
 ```
 
-### Using the Axios Client
-```bash
-cd ../clients/axios
-# Ensure .env is setup
-pnpm install
-pnpm dev/x402
-```
+You can generate a valide `x-payment` header with the [1Shot API x402 tool](https://1shotapi.com/tools).
 
-These clients will demonstrate how to:
+This will demonstrate how to:
 1. Make an initial request to get payment requirements
 2. Process the payment requirements
 3. Make a second request with the payment token

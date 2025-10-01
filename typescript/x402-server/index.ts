@@ -22,19 +22,27 @@ app.use(
         price: "$0.001",
         // network: "base" // uncomment for Base mainnet
         network: "base-sepolia",
+        config: {
+          description: "Access to weather data",
+          mimeType: "application/json",
+        },
       },
       "/premium/*": {
         // Define atomic amounts in any EIP-3009 token
         price: {
           amount: "100000",
           asset: {
-            address: "0x9fead8b19c044c2f404dac38b925ea16adaa2954",
+            address: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
             decimals: 18,
             eip712: {
               name: "USDC",
               version: "2",
             },
           },
+        },
+        config: {
+          description: "Access to premium content",
+          mimeType: "application/json",
         },
         // network: "base" // uncomment for Base mainnet
         network: "base-sepolia",
