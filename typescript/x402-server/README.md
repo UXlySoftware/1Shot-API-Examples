@@ -38,14 +38,27 @@ pnpm dev
 The easiest way to hit an endpoint is with `curl`:
 
 ```sh
+# hit the endpoint without a header to get price info
+curl -X GET http://localhost:4021/weather 
+curl -X GET http://localhost:4021/premium/content 
+```
+
+```sh
+# supply a valid x-payment header to access the paywalled content
 curl -X GET \
   http://localhost:4021/weather \
-  -H "x-payment: YOUR-BASE64-ENCODED-PAYMENT-PAYLOAD" \
+  -H "x-payment: PAYMNET-HEADER" \
+  -H "User-Agent: CustomUserAgent/1.0" \
+  -H "Accept: application/json"
+
+curl -X GET \
+  http://localhost:4021/premium/content \
+  -H "x-payment: PAYMNET-HEADER" \
   -H "User-Agent: CustomUserAgent/1.0" \
   -H "Accept: application/json"
 ```
 
-You can generate a valide `x-payment` header with the [1Shot API x402 tool](https://1shotapi.com/tools).
+You can generate a valid `x-payment` header with the [1Shot API x402 tool](https://1shotapi.com/tools).
 
 This will demonstrate how to:
 1. Make an initial request to get payment requirements

@@ -30,12 +30,12 @@ app.use(
       "/premium/*": {
         // Define atomic amounts in any EIP-3009 token
         price: {
-          amount: "100000",
+          amount: "1000",
           asset: {
-            address: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-            decimals: 18,
+            address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+            decimals: 6,
             eip712: {
-              name: "USDC",
+              name: "USD Coin ",
               version: "2",
             },
           },
@@ -45,7 +45,7 @@ app.use(
           mimeType: "application/json",
         },
         // network: "base" // uncomment for Base mainnet
-        network: "base-sepolia",
+        network: "polygon",
       },
     },
     facilitatorConfig,
