@@ -1,3 +1,9 @@
+<div align="center">
+  <a href="https://youtu.be/YxydlAkSZmU">
+    <img src="https://img.youtube.com/vi/YxydlAkSZmU/hqdefault.jpg" alt="Watch the tutorial">
+  </a>
+</div>
+
 # x402-express Example Server with 1Shot API
 
 This is an example Express.js server that demonstrates how to use the `x402-express` middleware to implement paywall functionality in your API endpoints using 1Shot API as a payments facilitator.
@@ -47,13 +53,13 @@ curl -X GET http://localhost:4021/premium/content
 # supply a valid x-payment header to access the paywalled content
 curl -X GET \
   http://localhost:4021/weather \
-  -H "x-payment: PAYMNET-HEADER" \
+  -H "x-payment: PAYMENT-HEADER" \
   -H "User-Agent: CustomUserAgent/1.0" \
   -H "Accept: application/json"
 
 curl -X GET \
   http://localhost:4021/premium/content \
-  -H "x-payment: PAYMNET-HEADER" \
+  -H "x-payment: PAYMENT-HEADER" \
   -H "User-Agent: CustomUserAgent/1.0" \
   -H "Accept: application/json"
 ```
