@@ -50,7 +50,8 @@ curl -X GET http://localhost:4021/premium/content
 ```
 
 ```sh
-# supply a valid x-payment header to access the paywalled content
+# supply a valid x-payment header to access the pay walled content
+# you can generate an x-paymnet header at https://1shotapi.com/tools
 curl -X GET \
   http://localhost:4021/weather \
   -H "x-payment: PAYMENT-HEADER" \
