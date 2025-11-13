@@ -16,8 +16,8 @@ const ONESHOT_BIZ_ID = requireEnv("ONESHOT_BIZ_ID");
 const chainId = Number(requireEnv("CHAIN_ID"));
 
 // Constants (you don't need to change these)
-const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"; // USDC
-const ONESHOT_USDC_PROMPT_ID = "db6a751f-550f-419f-96d2-7a0ef30cd222"; // 1Shot API prompt id for USDC contract methods
+const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"; // USDC on Base Sepolia
+const ONESHOT_USDC_PROMPT_ID = "db6a751f-550f-419f-96d2-7a0ef30cd222"; // 1Shot API prompt id for Base Sepolia USDC contract methods
 
 // Initialize the 1Shot API client
 // We only initialize this here so that we can easily check we have a 1Shot API server 
@@ -44,8 +44,8 @@ const oneshotRelayerAddress: `0x${string}` = oneshotWallet.response[0]
   .accountBalanceDetails?.accountAddress as `0x${string}`;
 console.log("1Shot Wallet:", oneshotWallet.response[0].accountBalanceDetails);
 
-// Assure we have Optimism USDC contract methods imported into our 1Shot API account so that we
-// can call its methods in a delegated transaction
+// Assure we have Base Sepolia USDC contract methods imported into our 1Shot API account so that we
+// can call its methods in a batch transaction
 const USDCMethods = await oneshotClient.contractMethods.assureContractMethodsFromPrompt(
     ONESHOT_BIZ_ID,
     {
@@ -55,6 +55,7 @@ const USDCMethods = await oneshotClient.contractMethods.assureContractMethodsFro
         promptId: ONESHOT_USDC_PROMPT_ID
     }
 )
+
 // find the contract method id associated with the "approve" method
 const approveMethod = USDCMethods.find(m => m.name === "approve");
 console.log("USDC approve method id:", approveMethod!.id);
