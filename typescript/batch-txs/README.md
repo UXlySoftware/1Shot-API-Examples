@@ -8,14 +8,16 @@
 
 1Shot API allows you to perform multiple actions in a single transaction through batching. Batching is enabled by automatically upgrading server wallets to MetaMask Smart Wallets on supported networks. 
 
+This example shows you how to use the 1Shot API typescript sdk to perform batched transactions with 1Shot API server wallets. 
+
 ## Setup
 
 1. Make a free [1Shot API](https://1shotapi.com) account.
 2. Go to the [API Keys](https://app.1shotapi.com/api-keys) tab and generate a new API key and secret.
-3. Provision an Optimism server wallet on the [wallets tab](https://app.1shotapi.com/wallets) and deposit a small amount of native token to cover transaction gas ($1 will do hundreds of txs).
-4. Clone this repo and `cd ./typescript/delegations` then `cp .env.example .env`.
-5. Input your 1Shot API key and secret as well as your business id (located at the top right corner of the 1Shot API dashboard) into the `.env` file
-6. Put a private key into the `.env` file (it doesn't need any funds, txs will be sponsored by your 1Shot API server wallet)
+3. Provision a Base Sepolia server wallet on the [wallets tab](https://app.1shotapi.com/wallets) and [deposit a small amount of native token](https://docs.base.org/base-chain/tools/network-faucets) to cover transaction gas ($1 will do hundreds of txs).
+4. Deposit a small amount of [Base Sepolia USDC](https://faucet.circle.com/) into your new 1Shot API server wallet.
+5. Clone this repo and `cd ./typescript/batch-txs` then `cp .env.example .env`.
+6. Input your 1Shot API key and secret as well as your business id (located at the top right corner of the 1Shot API dashboard) into the `.env` file
 
 ## Running the Delegation Example
 
@@ -35,42 +37,19 @@ npm run start
 You should see some output like this: 
 
 ```sh
-1Shot Wallets: {
+Chain id:  84532
+1Shot Wallet: {
   type: 0,
-  ticker: 'ARB',
-  chainId: 42161,
+  ticker: 'ETH',
+  chainId: 84532,
   tokenAddress: '',
-  accountAddress: '0x99f05136636c3800d417ecc6b7daf5e2e699e6e2',
-  balance: '0.001834003882069',
+  accountAddress: '0xfa781aaa39de86ed1354e6a93c69b6896569ac6b',
+  balance: '0.000999862599380089',
   decimals: 18
 }
-Viem account address: 0x9fEad8B19C044C2f404dac38B925Ea16ADaa2954
-signedDelegation: {
-  delegate: '0x99f05136636c3800d417ecc6b7daf5e2e699e6e2',
-  delegator: '0x9fEad8B19C044C2f404dac38B925Ea16ADaa2954',
-  authority: '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
-  caveats: [
-    {
-      enforcer: '0x7F20f61b1f09b08D970938F6fa563634d65c4EeB',
-      terms: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
-      args: '0x'
-    },
-    {
-      enforcer: '0x2c21fD0Cb9DC8445CB3fb0DC5E7Bb0Aca01842B5',
-      terms: '0x095ea7b3',
-      args: '0x'
-    }
-  ],
-  salt: '0x',
-  signature: '0x86a7a460f9d3b46570b3b4b0f3e19d3adc3556e36542db6abb5fdd86e64b5c4c54c663222c9bb18a4a451323b77654083c1d647ef4dd72049f29b52c0c74ea491c'
-}
-signedAuthorization: {
-  address: '0x63c0c19a282a1b52b07dd5a65b58948a07dae32b',
-  chainId: 42161,
-  nonce: 4,
-  signature: '0x90ff6850277c4dd4ec3594b784f501bd99772a1f0828a8212253fcb7b0b715895fbe562892f70e5c50bdba9cad144ecd5d222c02d6f020b087bbf9d2011c43301c'
-}
-1Shot API tx id: a225db64-e3ef-4cc2-9909-9a7c1e6d8038
+USDC approve method id: 06782cb2-f76c-49ed-8406-5a5ad36f1751
+USDC transfer method id: d7014424-1833-43ab-b11f-05d944c02a72
+1Shot API tx id: 7e807deb-580a-4457-a9d1-a20e2b419112
 ```
 
-This shows you the structure of the raw delegation and authorization objects so you can get a feel for what is being stored and relayed by 1Shot API.
+You can now visit the [transaction history](https://app.1shotapi.com/transaction-history) page to view the status of you batch transaction.

@@ -6,7 +6,7 @@
 
 # Sponsored Delegation with MetaMask Smart Wallet
 
-This example shows you how to set up sponsored delegations using the MetaMask Delegation Toolkit and 1Shot API. 1Shot API lets you store user delegations so they can be retrieved on-demand when needed. Additionally, 1Shot API makes delection execution simple using `executeAsDelegator` which automatically prepares the target function call, finds a compatible delegation, and routes the transaction through the Delegation Manager contract for you. 
+This example shows you how to set up sponsored delegations using the MetaMask Delegation Toolkit and 1Shot API. 1Shot API lets you store user delegations so they can be retrieved on-demand when needed. Additionally, 1Shot API makes delegation execution simple using `executeAsDelegator` which automatically prepares the target function call, finds a compatible delegation, and routes the transaction through the Delegation Manager contract for you. 
 
 In this example, you'll upgrade an EOA to a MetaMask Smart Wallet and execute a sponsored function call in a single transaction. This gives you a great deal of flexibility and gas efficiency when constructing user flows in your product.
 
