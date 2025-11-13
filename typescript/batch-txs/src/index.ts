@@ -16,15 +16,15 @@ const ONESHOT_BIZ_ID = requireEnv("ONESHOT_BIZ_ID");
 const chainId = Number(requireEnv("CHAIN_ID"));
 
 // Constants (you don't need to change these)
-const USDC_ADDRESS = "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701"; // USDC on Optimism
-const ONESHOT_USDC_PROMPT_ID = "3fde2e56-acdf-48e2-a854-b55bfa45021c"; // 1Shot API prompt id for Optimism USDC contract methods
+const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"; // USDC
+const ONESHOT_USDC_PROMPT_ID = "db6a751f-550f-419f-96d2-7a0ef30cd222"; // 1Shot API prompt id for USDC contract methods
 
 // Initialize the 1Shot API client
 // We only initialize this here so that we can easily check we have a 1Shot API server 
 // wallet provisioned and can access the server wallet's address so that we can delegate to it.
 const oneshotClient = new OneShotClient({
   apiKey: ONESHOT_KEY,
-  apiSecret: ONESHOT_SECRET
+  apiSecret: ONESHOT_SECRET,
 });
 
 // Ensure there is a Optimism Network server wallet for this business for delegation sponsorship
