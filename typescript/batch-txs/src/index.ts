@@ -64,9 +64,33 @@ console.log("USDC approve method id:", approveMethod!.id);
 const transferMethod = USDCMethods.find(m => m.name === "transfer");
 console.log("USDC transfer method id:", transferMethod!.id);
 
-// In a single transaction, upgrade the user's server wallet to a MM Smart Account
+// First we'll see how to execute approve() and transfer() as separate txs so we 
+// can compare the overall gas cost to the batched transaction
+const tx1 = await oneshotClient.contractMethods.execute(
+  approveMethod!.id,
+  {
+    "spender": oneshotWallet.response[0].accountBalanceDetails?.accountAddress,
+    "value": "10000"
+  },
+  {
+    memo: "Single Action Approve Test",
+  }
+)
+
+const tx2 = await oneshotClient.contractMethods.execute(
+  transferMethod!.id,
+  {
+    "to": oneshotWallet.response[0].accountBalanceDetails?.accountAddress,
+    "value": "10000"
+  },
+  {
+    memo: "Single Action Transfer Test",
+  }
+)
+
+// Finally, in a single transaction, upgrade the user's server wallet to a MM Smart Account
 // and execute an approve() then a transfer() on the USDC contract,
-const tx = await oneshotClient.contractMethods.executeBatch({
+const tx3 = await oneshotClient.contractMethods.executeBatch({
   walletId: oneshotWallet.response[0].id,
   contractMethods: [
     {
@@ -83,12 +107,12 @@ const tx = await oneshotClient.contractMethods.executeBatch({
         "value": "10000"
       },
       contractMethodId: transferMethod!.id,
-      executionIndex: 0
+      executionIndex: 1
     },
   ],
   memo: "Batch Approve and Transfer Test",
 })
 
-console.log("1Shot API tx id:", tx!.id);
-
-
+console.log("1Shot API approve tx id:", tx3!.id);
+console.log("1Shot API transfer tx id:", tx3!.id);
+console.log("1Shot API batch tx id:", tx3!.id);
