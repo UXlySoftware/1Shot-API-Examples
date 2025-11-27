@@ -1,0 +1,1356 @@
+{
+  "name": "Telegram Crypto Bot Template",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        256
+      ],
+      "id": "190f0744-a2ae-44c7-bb83-6fe2a88d5313",
+      "name": "Telegram Trigger",
+      "webhookId": "595ba0a0-df84-4356-a9a2-ce45b3446e64",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "wallets",
+        "operation": "create",
+        "chainId": 97,
+        "name": "=chatid-{{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "description": "={{ $('Telegram Trigger').item.json.message.from.first_name }}, {{ $('Telegram Trigger').item.json.message.from.last_name }}, {{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-1shot.oneShot",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        544
+      ],
+      "id": "0033526f-8621-4682-a54e-91ac5cfbb468",
+      "name": "Create a User Wallet",
+      "credentials": {
+        "oneShotOAuth2Api": {
+          "id": "X6EL2YVTzgn9tPwo",
+          "name": "Coinucopia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=You're wallet address is: {{ $('Create a User Wallet').item.json.accountAddress }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        544
+      ],
+      "id": "2881403f-63ea-4cee-83e8-d465ed3f3af8",
+      "name": "Send User Wallet Address",
+      "webhookId": "68a4dd30-203c-4d3e-9405-4f6b89344f99",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Telegram Trigger').item.json.callback_query.data }}",
+                    "rightValue": "create-token",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "64ad8225-177d-43a9-bbe1-492ddb7ee717"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "717968f3-f2d4-4dcb-8c20-97a32902c9f2",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.callback_query.data }}",
+                    "rightValue": "send-tokens",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "57bda2bc-dd86-4a87-9cdc-8718e16e7b8f",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.callback_query.data }}",
+                    "rightValue": "list-tokens",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        672,
+        -48
+      ],
+      "id": "6607bc9e-1e64-4592-9815-8f7fca3b49d4",
+      "name": "Switch on User Button Choice"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=You're wallet address is: `{{ $json.accountAddress }}`\nIt has {{ $json.accountBalanceDetails.balance }} BNB",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Create a token",
+                    "additionalFields": {
+                      "callback_data": "create-token"
+                    }
+                  },
+                  {
+                    "text": "Send Some Tokens",
+                    "additionalFields": {
+                      "callback_data": "send-tokens"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "See My Tokens",
+                    "additionalFields": {
+                      "callback_data": "list-tokens"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1344,
+        352
+      ],
+      "id": "de644b74-bbb9-4122-95dd-03e4a18e1402",
+      "name": "Send Action Keyboard Options",
+      "webhookId": "0bc145dd-7aa9-4636-a0af-7b60475687ff",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "message": "What do you want to call the token?",
+        "responseType": "freeText",
+        "options": {
+          "responseFormDescription": "The name your token will have in user wallets.",
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        -416
+      ],
+      "id": "430f6c1b-f7f7-48c3-bf44-e9326dfa8fc3",
+      "name": "Get the name of the token",
+      "webhookId": "c340a2db-91f7-4c49-8d00-d4a3d46da098",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "message": "What do you want the token symbol to be?",
+        "responseType": "freeText",
+        "options": {
+          "responseFormDescription": "The ticker that will appear next to a user's balance in their wallet.",
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        -416
+      ],
+      "id": "50d56b8e-6685-4cab-a57d-b14f2301275b",
+      "name": "Get the token Symbol",
+      "webhookId": "c340a2db-91f7-4c49-8d00-d4a3d46da098",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "=Creating {{ $('Get the name of the token').item.json.data.text }} ({{ $json.data.text }})",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1552,
+        -416
+      ],
+      "id": "01f7be1b-e7a2-44a0-bd60-2864b4e6967e",
+      "name": "Creation Confirmation",
+      "webhookId": "ea85825c-d943-45c3-800c-170f8d893180",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "={{ $('Get the name of the token').item.json.data.text }} deployed at `{{ $('Deploy User Token').item.json.logs[2].args[0] }}`",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2224,
+        -512
+      ],
+      "id": "bee6518b-9f87-4951-bf9d-36c6e18922a0",
+      "name": "Reply with Token Address",
+      "webhookId": "ea3eaaed-a547-4585-b9cc-ff483fc6231f",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "Token launch failed, please check your wallet has gas funds and try again.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2000,
+        -320
+      ],
+      "id": "c25342da-c718-4fa7-874b-2f0427d03838",
+      "name": "Try Again",
+      "webhookId": "762e6117-e06c-4d9a-9a5d-8647ea4b220d",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Telegram Entrypoint\n\nTrigger the workflows on either a message from a user in a DM or a callback query from a inline keyboard\n\nIMPORTANT - for this template, the chatid is used at the immutable id link between a user and their 1Shot API wallet. So in your bot settings, be sure to disable Groups to prevent creating wallets shared between group members. You could change the workflow to use the Telegram username instead, but usernames can be changed and Telegram users are also NOT guaranteed to have a username set. ",
+        "height": 448,
+        "width": 432,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -32
+      ],
+      "id": "05bc850b-8d8a-45d6-a0ab-b0c866755b45",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "cIMEqMtBcIk1Pcid",
+          "mode": "list",
+          "cachedResultName": "User Table",
+          "cachedResultUrl": "/projects/DJCvX3apkQ6WBaP9/datatables/cIMEqMtBcIk1Pcid"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chatid",
+              "keyValue": "={{ $json.message.chat.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        672,
+        448
+      ],
+      "id": "388e847c-322f-42c4-a020-d09abe4f893c",
+      "name": "Check for Existing User",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0668046c-3d12-4dad-8a32-5e9276867e48",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        448
+      ],
+      "id": "aee06c0a-1e0c-4a8b-aed9-6663d003d4c5",
+      "name": "Only respond to /start Messages"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "94abd6d0-00e8-4b3e-945c-49d502a94777",
+              "leftValue": "={{ $json.wallet }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        448
+      ],
+      "id": "6ae12b5c-0a77-4132-9bd3-29153053f512",
+      "name": "Does the User Have A Wallet"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "cIMEqMtBcIk1Pcid",
+          "mode": "list",
+          "cachedResultName": "User Table",
+          "cachedResultUrl": "/projects/DJCvX3apkQ6WBaP9/datatables/cIMEqMtBcIk1Pcid"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "wallet": "={{ $json.accountAddress }}",
+            "chatid": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "walletid": "={{ $json.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chatid",
+              "displayName": "chatid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "wallet",
+              "displayName": "wallet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "walletid",
+              "displayName": "walletid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        544
+      ],
+      "id": "4cd5acd3-4c0f-4372-8855-129c85459f69",
+      "name": "Record User Wallet"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "87f177f0-9898-4d4c-bb0b-1cae2b8b188a",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.callback_query }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e371c00a-4b75-4876-a8fc-5bba45234b61",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        224,
+        256
+      ],
+      "id": "b27531d9-e778-4764-a523-ab1b0bdd02f2",
+      "name": "Callback or Message"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n## /start\n\nThe user sends the /start command. If they don't already have a wallet, create one and record it in the data table. If they are an existing user, send them the keyboard options.",
+        "height": 336,
+        "width": 384,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        208,
+        416
+      ],
+      "id": "a03528e4-2753-447c-966a-09d4ea7a6077",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Handle Keyboard Options\n\nThe keyboard callback options are set in \"Send Action Keyboard Options\". This node switches on the user selections.\n\nThe branch should only be triggered once the user has a wallet.",
+        "height": 432,
+        "width": 448,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -256
+      ],
+      "id": "63d96d7c-6c2f-4fef-9e24-2cbbc3e78788",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n## Create a Wallet for User\n\nGenerate a new wallet for a user the first time they interact with your bot. Record the wallet/chatid pair in a data table for fast lookups.",
+        "height": 288,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        528
+      ],
+      "id": "a3ec6aa5-2275-42d1-98a8-333ddc7026f5",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "cXlOHxQFGfGoptRd",
+          "mode": "list",
+          "cachedResultName": "Token Table",
+          "cachedResultUrl": "/projects/DJCvX3apkQ6WBaP9/datatables/cXlOHxQFGfGoptRd"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chatid",
+              "condition": "ilike",
+              "keyValue": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id.toString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        896,
+        160
+      ],
+      "id": "ee684de6-f4c8-4208-87e5-71a4d78f3a3b",
+      "name": "Get User's Tokens",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst addresses = $input.all().map(item => `\\`${item.json.token}\\``);\nlet message =  \"Your token addresses:\\n\" + addresses.join(\"\\n\")\n\n$input.all()[0].json.message = message;\n\n// If other items exist, they pass through untouched\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        160
+      ],
+      "id": "7a8f9854-2baf-4bdf-9cca-164efd8efb6d",
+      "name": "Generate Message"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "cXlOHxQFGfGoptRd",
+          "mode": "list",
+          "cachedResultName": "Token Table",
+          "cachedResultUrl": "/projects/DJCvX3apkQ6WBaP9/datatables/cXlOHxQFGfGoptRd"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "token": "={{ $json.logs[2].args[0] }}",
+            "name": "={{ $('Get the name of the token').item.json.data.text }}",
+            "Wallet": "={{ $('Lookup User Wallet').item.json.wallet }}",
+            "chatid": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Wallet",
+              "displayName": "Wallet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "token",
+              "displayName": "token",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "chatid",
+              "displayName": "chatid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        -512
+      ],
+      "id": "1b8a011d-3600-4cad-af9a-49dc8ad10628",
+      "name": "Record New Token"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "cIMEqMtBcIk1Pcid",
+          "mode": "list",
+          "cachedResultName": "User Table",
+          "cachedResultUrl": "/projects/DJCvX3apkQ6WBaP9/datatables/cIMEqMtBcIk1Pcid"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chatid",
+              "keyValue": "={{ $json.callback_query.message.chat.id.toString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -32
+      ],
+      "id": "64ca9c9e-7053-4574-847f-d743e3e99d6c",
+      "name": "Lookup User Wallet"
+    },
+    {
+      "parameters": {
+        "resource": "wallets",
+        "chainId": 97,
+        "name": "={{ $json.chatid }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-1shot.oneShot",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        352
+      ],
+      "id": "9bb3a6ab-fdd9-4ab2-b2f2-e87bda8947a2",
+      "name": "Get User Wallet Balance",
+      "credentials": {
+        "oneShotOAuth2Api": {
+          "id": "X6EL2YVTzgn9tPwo",
+          "name": "Coinucopia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "message": "Which token do you want to send?",
+        "responseType": "freeText",
+        "options": {
+          "responseFormDescription": "The address of the token to send.",
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        -32
+      ],
+      "id": "62abadc9-492f-497b-901a-9e989a1891ca",
+      "name": "Which Token?",
+      "webhookId": "c340a2db-91f7-4c49-8d00-d4a3d46da098",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "message": "How many tokens do you want to send?",
+        "responseType": "freeText",
+        "options": {
+          "responseFormDescription": "How many tokens do you want to send.",
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        -32
+      ],
+      "id": "6129c127-91e0-4a57-9390-b371151af114",
+      "name": "How Many?",
+      "webhookId": "c340a2db-91f7-4c49-8d00-d4a3d46da098",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "message": "What address do you want to send them to?",
+        "responseType": "freeText",
+        "options": {
+          "responseFormDescription": "What address do you want to send the tokens to. ",
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1344,
+        -32
+      ],
+      "id": "3b54f188-dbf6-4981-9183-3a6f86f20478",
+      "name": "To What Address?",
+      "webhookId": "c340a2db-91f7-4c49-8d00-d4a3d46da098",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "=Tokens sent, tx-hash: `{{ $json.transactionHash }}`",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1792,
+        -128
+      ],
+      "id": "51776ea7-0b98-4f7d-9b3c-621027b26cae",
+      "name": "Reply with TX Hash",
+      "webhookId": "ea3eaaed-a547-4585-b9cc-ff483fc6231f",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "={{ $input.first().json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1344,
+        160
+      ],
+      "id": "ccc1a477-b8db-409f-905d-15fffbd4b4db",
+      "name": "Send Token List",
+      "webhookId": "b84fa4d1-ab2d-41fa-acaf-5404b3653bec",
+      "executeOnce": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contractMethodId": "6369ad5e-1ea8-416a-9e14-3ae07f0a0bd1",
+        "params": "={\n  \"to\": \"{{ $json.data.text }}\",\n  \"amount\": \"{{ $('How Many?').item.json.data.text + \"000000000000000000\"}}\"\n} ",
+        "additionalFields": {
+          "walletId": "={{ $('Lookup User Wallet').item.json.walletid }}",
+          "memo": "=chatid-{{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}: sending tokens",
+          "contractAddress": "={{ $('Which Token?').item.json.data.text }}"
+        }
+      },
+      "type": "n8n-nodes-1shot.oneShotSynch",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        -32
+      ],
+      "id": "9774fd62-ec06-4ffd-9331-06a386638e4b",
+      "name": "Send Tokens",
+      "credentials": {
+        "oneShotOAuth2Api": {
+          "id": "X6EL2YVTzgn9tPwo",
+          "name": "Coinucopia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "=Failed to send tokens. Please check your wallet balance for gas and try again.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1792,
+        64
+      ],
+      "id": "64b90b35-5bb8-4dd9-933e-b7ea3b426320",
+      "name": "Failure to Send Tokens",
+      "webhookId": "ea3eaaed-a547-4585-b9cc-ff483fc6231f",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contractMethodId": "d1459dee-e529-4e7c-b27d-4cdbddb6a72f",
+        "params": "={\n  \"admin\": \"{{ $('Lookup User Wallet').item.json.wallet }}\",\n  \"name\": \"{{ $('Get the name of the token').item.json.data.text }}\",\n  \"ticker\": \"{{ $('Get the token Symbol').item.json.data.text }}\",\n  \"premint\": \"{{ $('Max Supply').item.json.data.text + \"000000000000000000\" }}\"\n} ",
+        "additionalFields": {
+          "walletId": "={{ $('Lookup User Wallet').item.json.walletid }}",
+          "memo": "=chatid-{{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}-{{ $('Get the name of the token').item.json.data.text }}"
+        }
+      },
+      "type": "n8n-nodes-1shot.oneShotSynch",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        -416
+      ],
+      "id": "6f5c8f10-d163-4334-a3d8-8bad4a2b16a5",
+      "name": "Deploy User Token",
+      "credentials": {
+        "oneShotOAuth2Api": {
+          "id": "X6EL2YVTzgn9tPwo",
+          "name": "Coinucopia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "message": "What do you want want the max supply of the token to be (number)?",
+        "responseType": "freeText",
+        "options": {
+          "responseFormDescription": "The ticker that will appear in user wallets for your token.",
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1328,
+        -416
+      ],
+      "id": "3d2b990f-663a-4f40-9e10-2774c43c7a3e",
+      "name": "Max Supply",
+      "webhookId": "524c94e8-b931-420d-bc1d-86537534ae74",
+      "credentials": {
+        "telegramApi": {
+          "id": "uN6xtW1sUnA0WiMc",
+          "name": "@1shotdemobot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n## Data Tables\n\nThis workflow needs two data tables: `User Table` and `Token Table`. \n\nThe `User Table` should have `chatid`, `wallet` and `walletid` as columns. The `Token Table` should have `wallet`, `token`, `name` and `chatid` as columns. ",
+        "height": 400,
+        "width": 432
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        624,
+        416
+      ],
+      "id": "f3ff9ca5-3fae-4dda-9b45-ee5972c6ac57",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Deploy ERC-20 Tokens with the 1Shot Token Factory\n\nThis template uses the [1Shot Token Factory](https://github.com/1Shot-API/1Shot-Token-Factory) to deploy standard ERC-20 tokens. You can clone this repo, customize the smart contracts, and redeploy it on any EVM network to launch tokens for free. \n\nWhen deploying a token, you must specify its name, symbol, admin address (which has the permissions to mint tokens), and the max supply cap. ",
+        "height": 416,
+        "width": 1104
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        832,
+        -656
+      ],
+      "id": "3cfa9fa7-d866-428b-a17c-cd8bdb040e1c",
+      "name": "Sticky Note5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Callback or Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a User Wallet": {
+      "main": [
+        [
+          {
+            "node": "Record User Wallet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch on User Button Choice": {
+      "main": [
+        [
+          {
+            "node": "Get the name of the token",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Which Token?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get User's Tokens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the name of the token": {
+      "main": [
+        [
+          {
+            "node": "Get the token Symbol",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the token Symbol": {
+      "main": [
+        [
+          {
+            "node": "Max Supply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Creation Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Deploy User Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only respond to /start Messages": {
+      "main": [
+        [
+          {
+            "node": "Check for Existing User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for Existing User": {
+      "main": [
+        [
+          {
+            "node": "Does the User Have A Wallet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Does the User Have A Wallet": {
+      "main": [
+        [
+          {
+            "node": "Get User Wallet Balance",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a User Wallet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record User Wallet": {
+      "main": [
+        [
+          {
+            "node": "Send User Wallet Address",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback or Message": {
+      "main": [
+        [
+          {
+            "node": "Lookup User Wallet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Only respond to /start Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User's Tokens": {
+      "main": [
+        [
+          {
+            "node": "Generate Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Message": {
+      "main": [
+        [
+          {
+            "node": "Send Token List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record New Token": {
+      "main": [
+        [
+          {
+            "node": "Reply with Token Address",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup User Wallet": {
+      "main": [
+        [
+          {
+            "node": "Switch on User Button Choice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Wallet Balance": {
+      "main": [
+        [
+          {
+            "node": "Send Action Keyboard Options",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Which Token?": {
+      "main": [
+        [
+          {
+            "node": "How Many?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "How Many?": {
+      "main": [
+        [
+          {
+            "node": "To What Address?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To What Address?": {
+      "main": [
+        [
+          {
+            "node": "Send Tokens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Tokens": {
+      "main": [
+        [
+          {
+            "node": "Reply with TX Hash",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Failure to Send Tokens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deploy User Token": {
+      "main": [
+        [
+          {
+            "node": "Record New Token",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Try Again",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Max Supply": {
+      "main": [
+        [
+          {
+            "node": "Creation Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3dbc9ecf-abd1-44a7-a366-45d531898c70",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "62f017ec8f130d172e2e5f39bbf09515036bfd403dfa60fe06f5ab14b78705d0"
+  },
+  "id": "Of10PBmKWXdL1Ozs",
+  "tags": []
+}
