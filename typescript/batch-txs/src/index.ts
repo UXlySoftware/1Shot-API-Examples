@@ -113,6 +113,6 @@ const tx3 = await oneshotClient.contractMethods.executeBatch({
   memo: "Batch Approve and Transfer Test",
 })
 
-console.log("1Shot API approve tx id:", tx3!.id);
-console.log("1Shot API transfer tx id:", tx3!.id);
+console.log("1Shot API approve tx id:", tx1!.id);
+console.log("1Shot API transfer tx id:", tx2!.id);
 console.log("1Shot API batch tx id:", tx3!.id);
