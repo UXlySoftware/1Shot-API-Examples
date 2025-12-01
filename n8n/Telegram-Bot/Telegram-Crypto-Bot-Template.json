@@ -1053,6 +1053,22 @@
       ],
       "id": "3cfa9fa7-d866-428b-a17c-cd8bdb040e1c",
       "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Create Your Own Telegram Crypto Bot\nThis workflow template can be used as a starting point for your own Telegram bot that creates wallets for your users that they can use for making onchain transactions.\n\n\nWatch the [YouTube tutorial](https://youtu.be/bKRvt2DuVKA) for a complete walkthrough.\n@[youtube](bKRvt2DuVKA)",
+        "height": 524,
+        "width": 616,
+        "color": 6
+      },
+      "id": "56963c95-cb8e-4bd0-926a-f0036afe7580",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -336,
+        -608
+      ],
+      "typeVersion": 1
     }
   ],
   "pinData": {},
@@ -1346,7 +1362,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "3dbc9ecf-abd1-44a7-a366-45d531898c70",
+  "versionId": "9a040103-693c-41b3-93cb-5334e941157b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "62f017ec8f130d172e2e5f39bbf09515036bfd403dfa60fe06f5ab14b78705d0"
